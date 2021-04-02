@@ -1,0 +1,1 @@
+{"name":"calendar-app","version":"0.1.0","dependencies":{"@mdi/font":{"version":"5.9.55"},"core-js":{"version":"3.10.0"},"roboto-fontface":{"version":"0.10.0"},"vue":{"version":"2.6.12"},"vuetify":{"version":"2.4.9"},"vuex":{"version":"3.6.2"}}}
