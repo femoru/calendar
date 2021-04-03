@@ -6,6 +6,7 @@
         :reminders="reminders"
         @click:day="callNew"
         @click:reminder="callUpdate"
+        @delete:day="callDeleteDate"
       />
       <v-tooltip left>
         <template v-slot:activator="{ on, attrs }">
@@ -19,7 +20,7 @@
             v-bind="attrs"
             v-on="on"
             color="primary"
-            @click="dialogReminder = true"
+            @click="callNew(month)"
             ><v-icon>mdi-plus</v-icon>
           </v-btn>
         </template>
@@ -50,6 +51,7 @@
         v-model="dialogReminder"
         :reminder="editReminder"
         @update:reminder="save"
+        @delete="deleteReminder"
       />
     </v-main>
   </v-app>
@@ -77,7 +79,7 @@ export default {
       weather: null,
     },
     dialogReminder: false,
-    month: new Date().toISOString().substr(0, 7),
+    month: new Date().toISOString().substr(0, 10),
     reminders: [
       {
         id: 1,
@@ -175,6 +177,14 @@ export default {
       this.$vuetify.lang.current = newLocale;
       this.$forceUpdate();
     },
+    deleteReminder(reminder) {
+      const indexOf = this.reminders.findIndex((r) => r.id === reminder.id);
+      this.reminders.splice(indexOf, 1);
+    },
+    callDeleteDate(day){
+      const toDelete = this.reminders.filter(r => r.day === day)
+      toDelete.forEach(this.deleteReminder)
+    }
   },
 };
 </script>

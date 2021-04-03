@@ -33,7 +33,7 @@
           {{ reminder.text }}
         </p>
       </v-card-text>
-      <v-card-actions v-if="reminders.length > 2" class="pa-0">
+      <v-card-actions v-if="reminders.length > 0" class="pa-0">
         <v-menu absolute offset-y style="max-width: 600px">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -46,16 +46,13 @@
               >...</v-btn
             >
           </template>
-          <v-list three-line>
+          <v-list two-line class="py-0">
             <div v-for="(reminder, index) in reminders" :key="index">
               <v-list-item @click="$emit('click:reminder', reminder)">
                 <v-list-item-content>
-                  <v-list-item-title :style="'color:' + reminder.color">{{
-                    reminder.text
-                  }}</v-list-item-title>
-                  <v-list-item-subtitle>
-                    <span><em class="mdi mdi-alarm" />{{ reminder.time }}</span>
-                  </v-list-item-subtitle>
+                  <v-list-item-title :style="'color:' + reminder.color">
+                    {{ reminder.text }}
+                  </v-list-item-title>
                   <v-list-item-subtitle>
                     <span
                       ><em class="mdi mdi-map-marker" />{{
@@ -64,8 +61,9 @@
                     >
                   </v-list-item-subtitle>
                 </v-list-item-content>
-                <v-list-item-icon v-if="reminder.weather">
+                <v-list-item-icon class="my-0">
                   <v-img
+                    v-if="reminder.weather"
                     contain
                     :src="reminder.weather.icon"
                     :title="
@@ -73,10 +71,22 @@
                     "
                   ></v-img>
                 </v-list-item-icon>
+                <v-list-item-action>
+                  <v-list-item-action-text>
+                    <em class="mdi mdi-alarm" />{{ reminder.time }}
+                  </v-list-item-action-text>
+                </v-list-item-action>
               </v-list-item>
               <v-divider />
             </div>
           </v-list>
+          <v-btn
+            block
+            small
+            color="error"
+            @click.prevent="$emit('delete:day', myDay)"
+            >Delete all</v-btn
+          >
         </v-menu>
       </v-card-actions>
     </v-card>
