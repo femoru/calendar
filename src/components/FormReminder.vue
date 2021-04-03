@@ -2,19 +2,19 @@
   <v-dialog :value="dialogForm" max-width="300px">
     <v-card>
       <v-card-text>
-        <v-text-field v-model="reminder.text" label="Evento" hide-details>
+        <v-text-field v-model="myreminder.text" label="Event" hide-details>
           <template #prepend>
             <v-menu>
               <template #activator="{ on, attrs }">
                 <v-avatar
                   size="24"
-                  :color="reminder.color"
+                  :color="myreminder.color"
                   v-bind="attrs"
                   v-on="on"
                 />
               </template>
               <v-color-picker
-                v-model="reminder.color"
+                v-model="myreminder.color"
                 swatches-max-height="200"
                 hide-sliders
                 hide-inputs
@@ -31,7 +31,7 @@
           v-model="menuDatePicker"
           :close-on-content-click="false"
           :nudge-right="40"
-          :return-value.sync="reminder.day"
+          :return-value.sync="myreminder.day"
           transition="scale-transition"
           offset-y
           max-width="290px"
@@ -39,19 +39,20 @@
         >
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
+              label="Date"
               hide-details
               prepend-icon="mdi-calendar"
               v-bind="attrs"
               v-on="on"
-              v-model="reminder.day"
+              v-model="myreminder.day"
             >
             </v-text-field>
           </template>
           <v-date-picker
             v-if="menuDatePicker"
-            v-model="reminder.day"
+            v-model="myreminder.day"
             full-width
-            @click:date="$refs.menuDatePicker.save(reminder.day)"
+            @click:date="$refs.menuDatePicker.save(myreminder.day)"
           ></v-date-picker>
         </v-menu>
         <v-menu
@@ -59,7 +60,7 @@
           v-model="menuTimePicker"
           :close-on-content-click="false"
           :nudge-right="40"
-          :return-value.sync="reminder.time"
+          :return-value.sync="myreminder.time"
           transition="scale-transition"
           offset-y
           max-width="290px"
@@ -67,32 +68,31 @@
         >
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
-              label="Hora"
+              label="Time"
               prepend-icon="mdi-alarm"
               v-bind="attrs"
               v-on="on"
-              v-model="reminder.time"
+              v-model="myreminder.time"
               hide-details
             >
             </v-text-field>
           </template>
           <v-time-picker
             v-if="menuTimePicker"
-            v-model="reminder.time"
+            v-model="myreminder.time"
             full-width
-            @click:minute="$refs.menu.save(reminder.time)"
+            @click:minute="$refs.menu.save(myreminder.time)"
           ></v-time-picker>
         </v-menu>
-        {{reminder.city}}
         <v-autocomplete
-          label="Ubication"
+          label="Location"
           :loading="isLoadingCitys"
           :search-input.sync="search"
           :items="items"
           item-text="name"
           item-value="name"
           prepend-icon="mdi-map-marker"
-          v-model="reminder.city"
+          v-model="myreminder.city"
           @input="searchWeather"
           hide-details
         >
@@ -100,13 +100,10 @@
             <v-img
               max-width="24"
               contain
-              v-if="reminder.weather"
-              :src="reminder.weather.condition.icon"
+              v-if="myreminder.weather"
+              :src="myreminder.weather.icon"
               :title="
-                reminder.weather.condition.text +
-                ' ' +
-                reminder.weather.feelslike_c +
-                '°C'
+                myreminder.weather.text + ' ' + myreminder.weather.temp + '°C'
               "
             ></v-img>
           </template>
@@ -114,12 +111,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn text @click="$emit('input', false)">{{
-          $vuetify.lang.t("$vuetify.mycalendar.cancel")
-        }}</v-btn>
-        <v-btn @click="save">{{
-          $vuetify.lang.t("$vuetify.mycalendar.add")
-        }}</v-btn>
+        <v-btn text @click="$emit('input', false)">Cancel</v-btn>
+        <v-btn @click="save">Save</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -135,10 +128,11 @@ export default {
     reminder: {
       type: Object,
       default: () => ({
+        id: null,
         day: "",
         time: "",
         weather: null,
-        color: "",
+        color: "#F00",
         text: "",
       }),
     },
@@ -147,27 +141,16 @@ export default {
     return {
       apiKey: "de023885ab5d46bea73215733210204",
       search: "",
-      dialogForm:false,
+      dialogForm: false,
       menuDatePicker: false,
       menuTimePicker: false,
       isLoadingCitys: false,
       entries: [],
-      myreminder: {
-        day: "",
-        time: "",
-        weather: null,
-        color: "",
-        text: "",
-      },
+      myreminder: {},
     };
   },
   mounted() {
-    this.myreminder = {
-      day: this.$dayjs().format("YYYY-MM-DD"),
-      time: this.$dayjs().format("HH:mm"),
-      color: "#FF0000",
-      city:''
-    };
+    this.myreminder = { ...this.reminder };
   },
   methods: {
     async searchWeather(city) {
@@ -175,35 +158,36 @@ export default {
         `http://api.weatherapi.com/v1/current.json?key=${this.apiKey}&q=${city}&aqi=no`
       ).then((res) => res.json());
       const { current } = currentWeather;
-      this.reminder.weather = current;
+      this.myreminder.weather = {
+        icon: current.condition.icon,
+        text: current.condition.icon,
+        temp: current.feelslike_c,
+      };
     },
-    save(){
-      this.$emit('update:reminder', this.reminder)
-      this.dialogForm = false
-      this.$emit('input', false)
-      this.$emit('save',this.reminder)
-    }
+    save() {
+      this.$emit("update:reminder", { ...this.myreminder });
+      this.dialogForm = false;
+      this.$emit("input", false);
+      this.$emit("save", this.myreminder);
+    },
   },
   computed: {
     items() {
       return this.entries || [];
-    },
-    currentWeather() {
-      return this.reminder.weather;
     },
   },
   watch: {
     value: {
       deep: true,
       handler(newValue) {
-        this.dialogForm = newValue
+        this.dialogForm = newValue;
       },
     },
     reminder: {
       deep: true,
       handler(newValue) {
         this.myreminder = { ...newValue };
-        this.search = newValue.city
+        this.search = newValue.city;
       },
     },
     search(val, oldVal) {

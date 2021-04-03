@@ -1,9 +1,6 @@
 <template>
   <v-col class="elevation-2 flex-grow-0 calendar-cell align-stretch">
-    <v-card
-      :color="disabled ? 'info lighten-5' : 'primary lighten-5'"
-      class="fill-height rounded-0"
-    >
+    <v-card class="fill-height rounded-0">
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn
@@ -26,7 +23,7 @@
           v-for="(reminder, index) in items"
           :key="value + '' + index"
           class="text-truncate d-block mb-0 font-weight-bold text-caption"
-          :style="'color:'+reminder.color "
+          :style="'color:' + reminder.color"
           :title="reminder.text"
           @click="$emit('click:reminder', reminder)"
         >
@@ -37,7 +34,7 @@
         </p>
       </v-card-text>
       <v-card-actions v-if="reminders.length > 2" class="pa-0">
-        <v-menu v-model="showMenu" absolute offset-y style="max-width: 600px">
+        <v-menu absolute offset-y style="max-width: 600px">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               block
@@ -70,18 +67,14 @@
                 <v-list-item-icon v-if="reminder.weather">
                   <v-img
                     contain
-                    :src="reminder.weather.condition.icon"
+                    :src="reminder.weather.icon"
                     :title="
-                      reminder.weather.condition.text +
-                      ' ' +
-                      reminder.weather.feelslike_c +
-                      '°C'
+                      reminder.weather.text + ' ' + reminder.weather.temp + '°C'
                     "
                   ></v-img>
                 </v-list-item-icon>
               </v-list-item>
-                  <v-divider />
-
+              <v-divider />
             </div>
           </v-list>
         </v-menu>
@@ -114,6 +107,11 @@ export default {
     };
   },
   computed: {
+    computedReminders() {
+      return this.reminders.slice(0).sort((a, b) => {
+        return new Date(`${a.day} ${a.time}`) - new Date(`${b.day} ${b.time}`);
+      });
+    },
     colorAvatar() {
       return this.today === this.myDay
         ? "accent accent-5 white--text"
@@ -125,7 +123,7 @@ export default {
         : "";
     },
     items() {
-      return this.reminders.slice(0, 2);
+      return this.computedReminders.slice(0, 2);
     },
   },
 };
