@@ -10,7 +10,7 @@ import 'dayjs/locale/es'
 import 'dayjs/locale/en'
 import localeData from 'dayjs/plugin/localeData'
 
-dayjs.locale('es')
+// dayjs.locale('es')
 dayjs.extend(localeData)
 
 
@@ -20,5 +20,6 @@ Vue.prototype.$dayjs = dayjs
 new Vue({
   store,
   vuetify,
+  beforeCreate() { this.$store.commit('initStore');},
   render: (h) => h(App),
 }).$mount("#app");

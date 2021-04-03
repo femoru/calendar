@@ -47,7 +47,7 @@
             >
           </template>
           <v-list two-line class="py-0">
-            <div v-for="(reminder, index) in reminders" :key="index">
+            <div v-for="(reminder, index) in computedReminders" :key="index">
               <v-list-item @click="$emit('click:reminder', reminder)">
                 <v-list-item-content>
                   <v-list-item-title :style="'color:' + reminder.color">
