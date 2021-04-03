@@ -2,7 +2,7 @@
   <v-sheet>
     <v-container>
       <calendar-header v-model="month" />
-      <calendar-body v-model="month" v-on="$listeners" />
+      <calendar-body v-model="month" v-bind="$attrs" v-on="$listeners" />
     </v-container>
   </v-sheet>
 </template>
@@ -25,8 +25,8 @@ export default {
       month: new Date().toISOString().substr(0, 7),
     };
   },
-  created(){
-    this.month = this.value
+  created() {
+    this.month = this.value;
   },
   watch: {
     value: {
@@ -42,7 +42,7 @@ export default {
 .calendar-cell {
   min-width: calc(100% / 7);
 }
-  .calendar-body >>> .calenndar-cell{
-    height: calc(100vh/8);
+.calendar-body > .row > .calendar-cell {
+  border: 0.001rem dotted #81BEBE !important;
 }
 </style>

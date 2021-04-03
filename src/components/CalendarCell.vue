@@ -1,23 +1,91 @@
 <template>
-  <v-col class="elevation-1 flex-grow-0 calendar-cell">
-    <v-card :color="disabled ? 'secondary lighten-5' : ''" max-height="100%">
+  <v-col class="elevation-2 flex-grow-0 calendar-cell align-stretch">
+    <v-card
+      :color="disabled ? 'info lighten-5' : 'primary lighten-5'"
+      class="fill-height rounded-0"
+    >
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn :disabled="disabled" icon outlined :color="colorAvatar" small v-bind="attrs" v-on="on">
+          <v-btn
+            :disabled="disabled"
+            icon
+            outlined
+            :color="colorAvatar"
+            small
+            v-bind="attrs"
+            v-on="on"
+            @click.native.prevent="$emit('click:day', myDay)"
+          >
             {{ value }}
           </v-btn>
         </template>
         <span>{{ myDay }}</span>
       </v-tooltip>
-      <v-card-text class="pa-0" style="height: 100%">
+      <v-card-text class="pa-0">
         <p
-          v-for="n in 10"
-          :key="n"
-          class="text-truncate text--secondary d-block mb-0"
+          v-for="(reminder, index) in items"
+          :key="value + '' + index"
+          class="text-truncate d-block mb-0 font-weight-bold text-caption"
+          :style="'color:'+reminder.color "
+          :title="reminder.text"
+          @click="$emit('click:reminder', reminder)"
         >
-          10am Lorem Ipsum ta asca da sama
+          <span>{{
+            $dayjs(reminder.day + " " + reminder.time).format("ha")
+          }}</span>
+          {{ reminder.text }}
         </p>
       </v-card-text>
+      <v-card-actions v-if="reminders.length > 2" class="pa-0">
+        <v-menu v-model="showMenu" absolute offset-y style="max-width: 600px">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              block
+              x-small
+              class="primary font-weight-bold white--text px-auto"
+              v-on="on"
+              v-bind="attrs"
+              @click="$emit('click:more', { myDay, reminders })"
+              >...</v-btn
+            >
+          </template>
+          <v-list three-line>
+            <div v-for="(reminder, index) in reminders" :key="index">
+              <v-list-item @click="$emit('click:reminder', reminder)">
+                <v-list-item-content>
+                  <v-list-item-title :style="'color:' + reminder.color">{{
+                    reminder.text
+                  }}</v-list-item-title>
+                  <v-list-item-subtitle>
+                    <span><em class="mdi mdi-alarm" />{{ reminder.time }}</span>
+                  </v-list-item-subtitle>
+                  <v-list-item-subtitle>
+                    <span
+                      ><em class="mdi mdi-map-marker" />{{
+                        reminder.city
+                      }}</span
+                    >
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+                <v-list-item-icon v-if="reminder.weather">
+                  <v-img
+                    contain
+                    :src="reminder.weather.condition.icon"
+                    :title="
+                      reminder.weather.condition.text +
+                      ' ' +
+                      reminder.weather.feelslike_c +
+                      '°C'
+                    "
+                  ></v-img>
+                </v-list-item-icon>
+              </v-list-item>
+                  <v-divider />
+
+            </div>
+          </v-list>
+        </v-menu>
+      </v-card-actions>
     </v-card>
   </v-col>
 </template>
@@ -35,6 +103,10 @@ export default {
     month: {
       type: String,
     },
+    reminders: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -44,20 +116,23 @@ export default {
   computed: {
     colorAvatar() {
       return this.today === this.myDay
-        ? "deep-purple accent-4 white--text"
-        : "secondary lighten-5";
+        ? "accent accent-5 white--text"
+        : "primary";
     },
     myDay() {
       return this.month
         ? this.$dayjs(this.month + "-" + this.value).format("YYYY-MM-DD")
         : "";
     },
+    items() {
+      return this.reminders.slice(0, 2);
+    },
   },
 };
 </script>
 <style scoped>
 .calendar-cell {
-  height: calc(100vh / 8);
+  min-height: 88px;
   overflow-y: hidden;
 }
 </style>

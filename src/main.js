@@ -7,6 +7,7 @@ import "@mdi/font/css/materialdesignicons.css";
 import dayjs from 'dayjs'
 
 import 'dayjs/locale/es'
+import 'dayjs/locale/en'
 import localeData from 'dayjs/plugin/localeData'
 
 dayjs.locale('es')

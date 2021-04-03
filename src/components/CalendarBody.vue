@@ -1,15 +1,17 @@
 <template>
   <div class="calendar-body">
-    <v-row no-gutters>
+    <v-row no-gutters align-content="stretch">
       <calendar-cell
         v-for="(n, index) in firstMonthDayWeek"
         :key="'prevMonthDay' + index"
         disabled
         :value="prevMonthDays - firstMonthDayWeek + n"
       />
-      <calendar-cell @click.native.prevent="$emit('click:day',day(n))"
+      <calendar-cell
+        v-on="$listeners"
         :value="n"
         :month="month"
+        :reminders="dayreminders(day(n))"
         v-for="(n, index) in monthDays"
         :key="'monthDay' + index"
       />
@@ -33,6 +35,10 @@ export default {
       type: String,
       required: true,
     },
+    reminders: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -41,7 +47,10 @@ export default {
   },
   methods: {
     day(day) {
-      return this.$dayjs(this.month+"-"+day).format("YYYY-MM-DD");
+      return this.$dayjs(this.month + "-" + day).format("YYYY-MM-DD");
+    },
+    dayreminders(day) {
+      return this.reminders.filter((reminder) => reminder.day === day);
     },
     getWeeksInMonth(month) {
       let firstDayMonth = this.$dayjs(month).startOf("month");

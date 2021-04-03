@@ -1,14 +1,14 @@
 <template>
-  <div>
+  <div class="calendar-header">
     <calendar-toolbar-header v-model="month" />
     <v-row no-gutters>
       <v-col class="elevation-2 calendar-cell" v-for="(n, index) in 7" :key="'head' + index">
         <v-alert
           border="bottom"
           colored-border
-          color="deep-purple accent-4"
+          color="accent accent-4"
           elevation="2"
-          class="text-capitalize mb-0 text-center text-h6 rounded-b-sm"
+          class="text-capitalize mb-0 text-center text-h6 rounded-b-sm pa-2 pb-1"
         >
           {{ getDayName(n) }}</v-alert
         >
