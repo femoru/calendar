@@ -20,6 +20,6 @@ Vue.prototype.$dayjs = dayjs
 new Vue({
   store,
   vuetify,
-  beforeCreate() { this.$store.commit('initStore');},
+  beforeCreate() { this.$store.commit('store/initStore');},
   render: (h) => h(App),
 }).$mount("#app");

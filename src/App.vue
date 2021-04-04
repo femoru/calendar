@@ -17,6 +17,7 @@
             right
             fixed
             dark
+            data-testid="formReminder"
             v-bind="attrs"
             v-on="on"
             color="primary"
@@ -37,7 +38,7 @@
             <v-list-item-icon>
               <v-icon>mdi-translate</v-icon>
             </v-list-item-icon>
-            <v-switch true-value="en" false-value="es" @click="changeLocale" />
+            <v-switch true-value="en" false-value="es" :input-value="$vuetify.lang.current" @click="changeLocale" />
           </v-list-item>
           <v-list-item>
             <v-list-item-icon>
@@ -47,12 +48,14 @@
           </v-list-item>
         </v-list>
       </v-menu>
-      <form-reminder
-        v-model="dialogReminder"
-        :reminder="editReminder"
-        @update:reminder="save"
-        @delete="deleteReminder"
-      />
+      <v-dialog v-model="dialogReminder" max-width="300px">
+        <form-reminder
+          :reminder="editReminder"
+          @update:reminder="save"
+          @delete="deleteReminder"
+          @cancel="dialogReminder = false"
+        />
+      </v-dialog>
     </v-main>
   </v-app>
 </template>
@@ -60,7 +63,7 @@
 <script>
 import FormReminder from "./components/FormReminder.vue";
 import Calendar from "./components/Calendar";
-
+import { mapState } from 'vuex'
 export default {
   name: "App",
   components: { Calendar, FormReminder },
@@ -73,9 +76,7 @@ export default {
     this.restoreEditReminder();
   },
   computed: {
-    reminders() {
-      return this.$store.state.reminders;
-    },
+    ...mapState('store',['reminders'])
   },
   methods: {
     callNew(day) {
@@ -89,11 +90,12 @@ export default {
     },
     save(reminder) {
       if (reminder.id === null) {
-        this.$store.commit("addReminder", reminder);
+        this.$store.commit("store/addReminder", reminder);
       } else {
-        this.$store.commit("editReminder", reminder);
+        this.$store.commit("store/editReminder", reminder);
       }
       this.restoreEditReminder();
+      this.dialogReminder = false
     },
     restoreEditReminder() {
       const today = this.$dayjs();
@@ -107,14 +109,15 @@ export default {
       };
     },
     changeLocale() {
-      this.$store.dispatch("changeLocale", { vm: this });
+      this.$store.dispatch("store/changeLocale", { vm: this });
     },
     deleteReminder(reminder) {
-      this.$store.commit("deleteReminder", reminder);
+      this.$store.commit("store/deleteReminder", reminder);
+      this.dialogReminder = false
     },
     callDeleteDate(day) {
       const toDelete = this.reminders.filter((r) => r.day === day);
-      toDelete.forEach((r) => this.$store.commit("deleteReminder", r));
+      toDelete.forEach((r) => this.$store.commit("store/deleteReminder", r));
     },
   },
 };
